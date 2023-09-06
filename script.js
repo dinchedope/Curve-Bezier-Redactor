@@ -57,11 +57,68 @@
 //   // canvas-unsupported code here
 // }
 
+class LinkObj { 
+    constructor(value, htmlTag){
+        this.value = value;
+        this.html = htmlTag;
+        this.someObj = {
+            numb: 1,
+        }
+    }
+    clone(){
+        let newObj = new LinkObj();
+        Object.assign(newObj, this);
+        return newObj;
+    }
+}
+
+
+
 let modes = [
     "VIEW",
     "ADDING",
     "DELETING"
 ]
+
+
+let currentMode = new LinkObj(modes[0], document.querySelector("#modeIndecator span"));
+
+console.log(currentMode);
+
+// let currentMode_ = {
+//     value: modes[0],
+//     html: document.querySelector("#modeIndecator span"),
+// }
+
+function ChangeChecker(obj){
+    // console.log("we inside ChangeChecker");
+    // console.log(currentState);
+    // console.log(previousState);
+
+
+    for(let elem in obj){
+     
+        // if(currentState[elem] === previousState[elem]){
+        //     // console.log("Ok");
+        // }
+        // else{
+        //     // console.log("Not Ok");
+        // }
+    }
+}
+
+
+let currentState = {
+};
+let previousState = {};
+
+currentState.currentMode = currentMode;
+previousState.currentMode = currentState.currentMode.clone();
+
+console.log(currentState);
+console.log(previousState);
+
+
 
 
 // Control element declaration
@@ -73,16 +130,19 @@ const modeIndecator = document.querySelector("#modeIndecator span");
 
 
 
-let currentMode = modes[0]; // VIEW
+ChangeChecker(currentState);
+
+console.log(currentState.currentMode.html.);
 
 // Event Listeners
 
 btn_addPoint.addEventListener("click", () => {
-    currentMode = modes[1];
+    currentMode.value = modes[1];
+    ChangeChecker();
 }, false);
 
 btn_delPoint.addEventListener("click", () => {
-    currentMode = modes[2];
+    currentState.currentMode = modes[2];
+    ChangeChecker(currentState);
 }, false);
- 
-modeIndecator.innerHTML = currentMode;
+

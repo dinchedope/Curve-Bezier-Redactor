@@ -9,8 +9,11 @@ body{
 }
 
 #playGround{
-    height: 80%;
-    width: 100%;
+    height: calc(80% - 40px);
+    width: calc(100% - 40px);
+    border: dashed red;
+    box-sizing: border-box;
+    margin: 20px;
 }
 
 #controlPanel{
