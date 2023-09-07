@@ -132,7 +132,7 @@ const modeIndecator = document.querySelector("#modeIndecator span");
 
 ChangeChecker(currentState);
 
-console.log(currentState.currentMode.html.);
+// console.log(currentState.currentMode.html.);
 
 // Event Listeners
 
@@ -145,4 +145,3 @@ btn_delPoint.addEventListener("click", () => {
     currentState.currentMode = modes[2];
     ChangeChecker(currentState);
 }, false);
-
