@@ -6,7 +6,14 @@ let modes = [
     "DELETING"
 ]
 
-let RADIUS = 10;
+let RADIUS = 4;
+
+let DELAY = 0.01;
+
+const canvas_playGround = document.querySelector("#playGround");
+let playgroundWidth   = canvas_playGround.clientWidth;
+let playgroundHeight  = canvas_playGround.clientHeight;
+let ctx = canvas_playGround.getContext("2d");
 
 // STATES  
 
@@ -135,6 +142,14 @@ class Circle {
 // Functions
 
 
+/**
+ * 
+ * @param {Circle} figur //Need to create a parent class for figure to take them coords. 
+ */
+function TakePoint(figur){
+    return new Point(figur.coords.x, figur.coords.y);
+}
+
 
 /**
  * 
@@ -149,17 +164,89 @@ function drawPoint(CircleObj){
     ctx.closePath();
 }
 
+/**
+ * 
+ * @param {Point} Point1 
+ * @param {Point} Point2 
+ */
+
+function drawLine(Point1, Point2){
+    
+    ctx.beginPath();
+    ctx.strokeStyle = "rgb(255, 0, 0)";
+    ctx.moveTo(Point1.x, Point1.y);
+    ctx.lineTo(Point2.x, Point2.y);
+    ctx.stroke();
+    ctx.closePath();
+    console.log(`Draw line: ${Point1.x} - ${Point1.y} / ${Point2.x} - ${Point2.y}`);
+}
+
+/**
+ * 
+ * @param {Point} Point1 
+ * @param {Point} Point2 
+ * @param {number} t 
+ * @returns {Point}
+ */
+
+function lerp(Point1, Point2, t){
+    return new Point(((1 - t) * Point1.x + t * Point2.x), ((1 - t) * Point1.y + t * Point2.y));
+}
+
+/**
+ * Function draw lines between points
+ */
+
+function lineConnector(){
+    console.log(gPoints.length);
+    if(gPoints.length > 1){
+        for(let i = 0; i < gPoints.length-1; i++){
+            drawLine(gPoints[i].coords, gPoints[i+1].coords);
+        }
+    }
+
+    for(let i = 0; i < gPoints.length; i++){
+        
+    }
+}
+
+function bezierCreator(){
+    let allCoords = gPoints.map(figur => {
+        return TakePoint(figur);
+    });
+
+    let startPoint = allCoords[0];
+
+    let coords = [];
+    let newCoords = [];
+    for(let t = 0; t <= 1; t += DELAY){
+        newCoords = allCoords.slice(0);
+        for(let groups = gPoints.length-1; groups > 0; groups--){
+            coords = newCoords;
+            newCoords = [];
+            for(let i = 0; i < groups; i++){
+                newCoords.push(lerp(coords[i], coords[i+1], t));
+            }  
+ 
+        }
+        drawLine(startPoint, newCoords[0]);
+        startPoint = newCoords[0];
+    }
+}
+
+
+
 // INIT
 
 let gPoints = [];
 
-const btn_addPoint = document.querySelector("#btn_addPoint");
-const btn_delPoint = document.querySelector("#btn_delPoint");
+const btn_addPoint    = document.querySelector("#btn_addPoint");
+const btn_delPoint    = document.querySelector("#btn_delPoint");
 const btn_turnoffMode = document.querySelector("#btn_turnoffMode");
+const btn_turnbtn_createBezieroffMode = document.querySelector("#btn_createBezier");
 
-const canvas_playGround = document.querySelector("#playGround");
-const playgroundWidth = canvas_playGround.clientWidth;
-const playgroundHeight = canvas_playGround.clientHeight;
+
+
 canvas_playGround.setAttribute("width", playgroundWidth);
 canvas_playGround.setAttribute("height", playgroundHeight);
 console.log(`${playgroundWidth} / ${playgroundHeight}`);
@@ -171,7 +258,7 @@ modeIndecator.innerHTML = modes[0];
 
 // OBJECTS
 
-let ctx = canvas_playGround.getContext("2d");
+
 
 let currentMode = new LinkObj(modes[0], modeIndecator);
 
@@ -190,8 +277,13 @@ btn_turnoffMode.addEventListener("click", () => {
     currentMode.value = modes[0];
 }, false);
 
+btn_createBezier.addEventListener("click", () => {
+    bezierCreator();
+}, false);
+
 canvas_playGround.addEventListener("click", (event) => {
     gPoints.push(new Circle(new Point(event.offsetX, event.offsetY), RADIUS))
-    //console.log(event);
+    console.log(`${event.offsetX} - ${event.offsetY}`);
     drawPoint(gPoints[gPoints.length - 1]);
+    lineConnector();
 }, false);
