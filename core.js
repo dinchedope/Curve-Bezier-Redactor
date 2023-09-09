@@ -6,7 +6,7 @@ let modes = [
     "DELETING"
 ]
 
-let RADIUS = 4;
+let RADIUS = 5;
 
 let DELAY = 0.01;
 
@@ -15,38 +15,11 @@ let playgroundWidth   = canvas_playGround.clientWidth;
 let playgroundHeight  = canvas_playGround.clientHeight;
 let ctx = canvas_playGround.getContext("2d");
 
+let gameAction;
+
+let graphElemtns = [];
+
 // STATES  
-
-// let currentState = {};
-// let previousState = {};
-
-// ChangeChecker
-
-// function ChangeChecker(current, previous){
-//     for(let prop in current){
-//         if(current.hasOwnProperty[prop] == previous.hasOwnProperty(prop)){
-//             switch(typeof current[prop]){
-//                 case "Object":
-//                     ChangeChecker(current[prop], previous[prop]);
-//                     break;
-//                 case "Function":
-//                     break;
-//                 default: 
-//                     if(current[prop] !== current[prop]){
-                        
-//                     }
-//                     break;    
-//             }
-//         } else {
-//             return false;
-//         }
-       
-//     }
-//     return true;
-// }
-
-// function PropertyChangedHandler()
-
 
 // Classes
 
@@ -141,7 +114,6 @@ class Circle {
 
 // Functions
 
-
 /**
  * 
  * @param {Circle} figur //Need to create a parent class for figure to take them coords. 
@@ -178,7 +150,7 @@ function drawLine(Point1, Point2){
     ctx.lineTo(Point2.x, Point2.y);
     ctx.stroke();
     ctx.closePath();
-    console.log(`Draw line: ${Point1.x} - ${Point1.y} / ${Point2.x} - ${Point2.y}`);
+    //console.log(`Draw line: ${Point1.x} - ${Point1.y} / ${Point2.x} - ${Point2.y}`);
 }
 
 /**
@@ -198,7 +170,7 @@ function lerp(Point1, Point2, t){
  */
 
 function lineConnector(){
-    console.log(gPoints.length);
+    //console.log(gPoints.length);
     if(gPoints.length > 1){
         for(let i = 0; i < gPoints.length-1; i++){
             drawLine(gPoints[i].coords, gPoints[i+1].coords);
@@ -234,11 +206,57 @@ function bezierCreator(){
     }
 }
 
+function clearField(){
+    ctx.fillStyle = "rgb(255, 255, 255)";
+    ctx.rect(0, 0, playgroundWidth, playgroundHeight);
+    ctx.fill();
+}
+
+function redrawer(){
+    clearField();
+    lineConnector();
+
+
+    for(let i = 0; i < graphElemtns.length; i++){
+        for(let elem of graphElemtns[i]){
+            if(elem instanceof(Circle)){
+                drawPoint(elem);
+            }
+        }
+    }
+}
+
+
+function setPoints(event){
+    gPoints.push(new Circle(new Point(event.offsetX, event.offsetY), RADIUS))
+    console.log(`${event.offsetX} - ${event.offsetY}`);
+    drawPoint(gPoints[gPoints.length - 1]);
+}
+
+function delPoints(event){
+    //console.log(gPoints);
+    for(let i = 0; i < gPoints.length; i++){
+
+        // (x - xo)^2 + (y - yo)^2 = r^2
+        //console.log(`mouse position: ${event.offsetX} - ${event.offsetY} / circle center: ${gPoints[i].coords.x} - ${gPoints[i].coords.y}`);
+        let currentR = Math.sqrt(Math.pow((event.offsetX - gPoints[i].coords.x), 2) + Math.pow((event.offsetY - gPoints[i].coords.y), 2));
+        //console.log(currentR);
+        //console.log(`currentR = ${currentR} / RADIUS = ${RADIUS}`);
+        if(currentR <= gPoints[i].radius){
+            //console.log("DELETE");
+            gPoints.splice(i, 1);
+        }
+    }
+}
+
 
 
 // INIT
 
 let gPoints = [];
+graphElemtns[0] = gPoints;
+
+gameAction = setPoints;
 
 const btn_addPoint    = document.querySelector("#btn_addPoint");
 const btn_delPoint    = document.querySelector("#btn_delPoint");
@@ -267,10 +285,12 @@ let currentMode = new LinkObj(modes[0], modeIndecator);
 
 btn_addPoint.addEventListener("click", () => {
     currentMode.value = modes[1];
+    gameAction = setPoints;
 }, false);
 
 btn_delPoint.addEventListener("click", () => {
     currentMode.value = modes[2];
+    gameAction = delPoints;
 }, false);
 
 btn_turnoffMode.addEventListener("click", () => {
@@ -282,8 +302,9 @@ btn_createBezier.addEventListener("click", () => {
 }, false);
 
 canvas_playGround.addEventListener("click", (event) => {
-    gPoints.push(new Circle(new Point(event.offsetX, event.offsetY), RADIUS))
-    console.log(`${event.offsetX} - ${event.offsetY}`);
-    drawPoint(gPoints[gPoints.length - 1]);
-    lineConnector();
+    
+    gameAction(event);
+    redrawer();
+
+
 }, false);
