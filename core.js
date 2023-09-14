@@ -17,7 +17,7 @@ let ctx = canvas_playGround.getContext("2d");
 
 let gameAction;
 
-let graphElemtns = [];
+let graphElemetns = [];
 
 // STATES  
 
@@ -217,8 +217,8 @@ function redrawer(){
     lineConnector();
 
 
-    for(let i = 0; i < graphElemtns.length; i++){
-        for(let elem of graphElemtns[i]){
+    for(let i = 0; i < graphElemetns.length; i++){
+        for(let elem of graphElemetns[i]){
             if(elem instanceof(Circle)){
                 drawPoint(elem);
             }
@@ -236,12 +236,8 @@ function setPoints(event){
 function delPoints(event){
     //console.log(gPoints);
     for(let i = 0; i < gPoints.length; i++){
-
         // (x - xo)^2 + (y - yo)^2 = r^2
-        //console.log(`mouse position: ${event.offsetX} - ${event.offsetY} / circle center: ${gPoints[i].coords.x} - ${gPoints[i].coords.y}`);
         let currentR = Math.sqrt(Math.pow((event.offsetX - gPoints[i].coords.x), 2) + Math.pow((event.offsetY - gPoints[i].coords.y), 2));
-        //console.log(currentR);
-        //console.log(`currentR = ${currentR} / RADIUS = ${RADIUS}`);
         if(currentR <= gPoints[i].radius){
             //console.log("DELETE");
             gPoints.splice(i, 1);
@@ -254,7 +250,7 @@ function delPoints(event){
 // INIT
 
 let gPoints = [];
-graphElemtns[0] = gPoints;
+graphElemetns[0] = gPoints;
 
 gameAction = setPoints;
 
@@ -302,9 +298,6 @@ btn_createBezier.addEventListener("click", () => {
 }, false);
 
 canvas_playGround.addEventListener("click", (event) => {
-    
     gameAction(event);
     redrawer();
-
-
 }, false);
